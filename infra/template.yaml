@@ -1,0 +1,100 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  StayMosaic background workflows (SCAFFOLD). Not deployed or tested. Review IAM,
+  networking and parameters before use. The web app itself is deployed separately
+  (e.g. AWS Amplify Hosting, App Runner or ECS).
+
+Parameters:
+  BedrockModelId:
+    Type: String
+    Description: Bedrock model or inference-profile ID enabled in this account and region.
+  DatabaseSecretArn:
+    Type: String
+    Description: Secrets Manager secret holding PostgreSQL credentials (host, user, password, dbname).
+  SubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+  SecurityGroupId:
+    Type: AWS::EC2::SecurityGroup::Id
+
+Globals:
+  Function:
+    Runtime: nodejs22.x
+    Timeout: 30
+    MemorySize: 512
+    Environment:
+      Variables:
+        BEDROCK_MODEL_ID: !Ref BedrockModelId
+        DATABASE_SECRET_ARN: !Ref DatabaseSecretArn
+    VpcConfig:
+      SubnetIds: !Ref SubnetIds
+      SecurityGroupIds: [!Ref SecurityGroupId]
+
+Resources:
+  AttachmentBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      PublicAccessBlockConfiguration: { BlockPublicAcls: true, BlockPublicPolicy: true, IgnorePublicAcls: true, RestrictPublicBuckets: true }
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault: { SSEAlgorithm: aws:kms }
+      LifecycleConfiguration:
+        Rules:
+          - { Id: expire-attachments, Status: Enabled, ExpirationInDays: 90 }
+      NotificationConfiguration:
+        LambdaConfigurations:
+          - { Event: "s3:ObjectCreated:*", Function: !GetAtt AttachmentProcessorFunction.Arn, Filter: { S3Key: { Rules: [{ Name: prefix, Value: attachments/ }] } } }
+
+  ClassifyDLQ:
+    Type: AWS::SQS::Queue
+    Properties: { MessageRetentionPeriod: 1209600 }
+
+  ClassifyQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      VisibilityTimeout: 120
+      RedrivePolicy: { deadLetterTargetArn: !GetAtt ClassifyDLQ.Arn, maxReceiveCount: 3 }
+
+  ClassifyRequestFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: lambdas/classify-request.handler
+      CodeUri: .
+      Description: Classifies queued guest requests with Bedrock (rules fallback) and stores a recommendation.
+      Events:
+        Queue: { Type: SQS, Properties: { Queue: !GetAtt ClassifyQueue.Arn, BatchSize: 5 } }
+      Policies:
+        - Statement:
+            - { Effect: Allow, Action: [bedrock:InvokeModel, bedrock:Converse], Resource: "*" }  # scope to the model ARN in production
+            - { Effect: Allow, Action: secretsmanager:GetSecretValue, Resource: !Ref DatabaseSecretArn }
+    Metadata: { BuildMethod: esbuild, BuildProperties: { Minify: true, Target: es2022, EntryPoints: [lambdas/classify-request.ts] } }
+
+  ShiftHandoverFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: lambdas/shift-handover.handler
+      CodeUri: .
+      Description: Generates a handover report per property shortly before each shift change.
+      Events:
+        Morning: { Type: Schedule, Properties: { Schedule: "cron(45 5 * * ? *)" } }
+        Afternoon: { Type: Schedule, Properties: { Schedule: "cron(45 13 * * ? *)" } }
+        Night: { Type: Schedule, Properties: { Schedule: "cron(45 21 * * ? *)" } }
+      Policies:
+        - Statement:
+            - { Effect: Allow, Action: [bedrock:InvokeModel, bedrock:Converse], Resource: "*" }
+            - { Effect: Allow, Action: secretsmanager:GetSecretValue, Resource: !Ref DatabaseSecretArn }
+    Metadata: { BuildMethod: esbuild, BuildProperties: { Minify: true, Target: es2022, EntryPoints: [lambdas/shift-handover.ts] } }
+
+  AttachmentProcessorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: lambdas/attachment-processor.handler
+      CodeUri: .
+      Description: Validates uploaded attachments and records scan status. Malware scanning engine still to be chosen.
+      Policies:
+        - S3ReadPolicy: { BucketName: !Sub "${AWS::StackName}-attachments-placeholder" }  # replace with the bucket name
+    Metadata: { BuildMethod: esbuild, BuildProperties: { Minify: true, Target: es2022, EntryPoints: [lambdas/attachment-processor.ts] } }
+
+Outputs:
+  ClassifyQueueUrl: { Value: !Ref ClassifyQueue }
+  AttachmentBucketName: { Value: !Ref AttachmentBucket }
