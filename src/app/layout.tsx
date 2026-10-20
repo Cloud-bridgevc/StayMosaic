@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://staymosaic.site"),
+  openGraph: { siteName: "StayMosaic", url: "https://staymosaic.site", type: "website" },
   title: { default: "StayMosaic: AI-native operations for hotels and serviced apartments", template: "%s · StayMosaic" },
   description:
     "StayMosaic turns guest requests into organised, trackable tasks and helps hospitality teams coordinate service across departments. AI recommends; your staff decide.",

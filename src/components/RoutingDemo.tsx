@@ -28,9 +28,12 @@ export default function RoutingDemo() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [decision, setDecision] = useState<Decision>(null);
+  const [editing, setEditing] = useState(false);
+  const [ovDept, setOvDept] = useState<string>("");
+  const [ovPri, setOvPri] = useState<Priority | "">("");
 
   async function run() {
-    setLoading(true); setError(""); setDecision(null);
+    setLoading(true); setError(""); setDecision(null); setEditing(false); setOvDept(""); setOvPri("");
     try {
       const rules = DEFAULT_RULES.map((r) => (r.id === "r-noise" ? { ...r, priority: noisePriority } : r));
       const res = await fetch("/api/classify", {
@@ -51,7 +54,10 @@ export default function RoutingDemo() {
   }
 
   const c = result;
-  const deptLabel = c ? DEPARTMENTS.find((d) => d.id === c.department)?.label : "";
+  const finalDept = c ? (ovDept || c.department) : "";
+  const finalPri = c ? ((ovPri || c.priority) as Priority) : "normal";
+  const changed = !!c && (finalDept !== c.department || finalPri !== c.priority);
+  const deptLabel = c ? DEPARTMENTS.find((d) => d.id === finalDept)?.label : "";
 
   return (
     <div className="grid g2" style={{ alignItems: "start" }}>
@@ -117,18 +123,28 @@ export default function RoutingDemo() {
           {c ? (
             <div style={{ marginTop: "0.5rem" }}>
               {decision === null && (
+                <>
+                {editing && (
+                  <div className="grid g2" style={{ marginBottom: "0.6rem" }}>
+                    <div><label htmlFor="ov-dept">Department</label>
+                      <select id="ov-dept" value={finalDept} onChange={(e) => setOvDept(e.target.value)}>{DEPARTMENTS.map((d) => <option key={d.id} value={d.id}>{d.label}</option>)}</select></div>
+                    <div><label htmlFor="ov-pri">Priority</label>
+                      <select id="ov-pri" value={finalPri} onChange={(e) => setOvPri(e.target.value as Priority)}>{["low", "normal", "high", "urgent"].map((p) => <option key={p}>{p}</option>)}</select></div>
+                  </div>
+                )}
                 <div className="row">
-                  <button className="btn btn-sm btn-primary" onClick={() => setDecision("approved")}>Approve and create task</button>
-                  <button className="btn btn-sm" onClick={() => setDecision("approved")}>Change routing…</button>
+                  <button className="btn btn-sm btn-primary" onClick={() => setDecision("approved")}>{editing && changed ? "Create task with my changes" : "Approve and create task"}</button>
+                  <button className="btn btn-sm" onClick={() => { setEditing((v) => !v); if (editing) { setOvDept(""); setOvPri(""); } }}>{editing ? "Cancel changes" : "Change routing…"}</button>
                   {c.suggestEscalation && <button className="btn btn-sm btn-danger" onClick={() => setDecision("escalated")}>Escalate to duty manager</button>}
                 </div>
+                </>
               )}
               {c.suggestEscalation && decision === null && <p className="xs muted" style={{ margin: "0.5rem 0 0" }}>AI suggests escalation: {c.escalationReason} Only a person can escalate.</p>}
               {decision && (
                 <div className="ai-box" style={{ background: "#fffdf8" }}>
                   <div className="h">{decision === "escalated" ? "Escalated by staff (simulated)" : "Task created (simulated)"}</div>
-                  <div><strong>{c.ruleName}</strong> · {deptLabel} · <PriorityBadge p={c.priority} /></div>
-                  <div className="small muted">Assigned to {DEMO_ASSIGNEE[c.department]} (sample roster) · due in {c.slaMinutes} min · approved by Duty Manager (sample)</div>
+                  <div><strong>{c.ruleName}</strong> · {deptLabel} · <PriorityBadge p={finalPri} />{changed && <span className="badge b-gold" style={{ marginLeft: "0.4rem" }}>Changed by staff</span>}</div>
+                  <div className="small muted">Assigned to {DEMO_ASSIGNEE[finalDept]} (sample roster) · due in {c.slaMinutes} min · approved by Duty Manager (sample)</div>
                   <button className="btn btn-sm" style={{ marginTop: "0.5rem" }} onClick={() => setDecision(null)}>Undo</button>
                 </div>
               )}

@@ -1,5 +1,10 @@
 import Link from "next/link";
 
+const TEAM = [
+  { name: "Harris Morrison", role: "Founder and CEO" },
+  { name: "Majekodunmi Fasheke", role: "Co-Founder and CTO" },
+];
+
 const STEPS = [
   { n: "1", t: "A request arrives", d: "From your guest form or the front desk. Photos and PDFs attach securely once storage is connected." },
   { n: "2", t: "AI reads and recommends", d: "It classifies the request and proposes a department, priority, SLA and next action using your hotel’s rules." },
@@ -41,11 +46,11 @@ export default function Home() {
               <div className="small muted" style={{ marginTop: "0.3rem" }}>Matched “ac”, “very warm” → Air conditioning fault. Also mentions water: check plumbing.</div>
             </div>
             <div className="row" style={{ marginTop: "0.8rem" }}>
-              <span className="btn btn-primary btn-sm" aria-hidden="true">Approve and assign to Ben A.</span>
-              <span className="btn btn-sm" aria-hidden="true">Change</span>
-              <span className="btn btn-sm btn-danger" aria-hidden="true">Escalate</span>
+              <Link className="btn btn-primary btn-sm" href="/demo">Approve and assign to Ben A.</Link>
+              <Link className="btn btn-sm" href="/demo">Change</Link>
+              <Link className="btn btn-sm btn-danger" href="/demo">Escalate</Link>
             </div>
-            <p className="xs muted" style={{ margin: "0.7rem 0 0" }}>The buttons are the point: a person makes each call.</p>
+            <p className="xs muted" style={{ margin: "0.7rem 0 0" }}>These buttons open the interactive demo, where you make each call yourself.</p>
           </div>
         </div>
       </section>
@@ -97,6 +102,21 @@ export default function Home() {
             <li>Role-based views by property and department</li>
             <li>Audit log of every approval, change and escalation</li>
           </ul>
+        </div>
+      </section>
+
+      <section className="section alt" id="team">
+        <div className="wrap">
+          <div className="eyebrow">Team</div>
+          <h2>The people behind StayMosaic</h2>
+          <div className="grid g2" style={{ marginTop: "1.5rem", maxWidth: 760 }}>
+            {TEAM.map((m) => (
+              <div className="card" key={m.name}>
+                <h3 style={{ marginBottom: "0.2rem" }}>{m.name}</h3>
+                <div className="small muted">{m.role}</div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 

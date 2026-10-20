@@ -34,7 +34,8 @@ export function SiteFooter() {
               <Link href="/features">Features</Link><br />
               <Link href="/use-cases">Hotels and serviced apartments</Link><br />
               <Link href="/pricing">Pricing</Link><br />
-              <Link href="/faq">FAQ</Link>
+              <Link href="/faq">FAQ</Link><br />
+              <Link href="/#team">Team</Link>
             </p>
           </div>
           <div>
@@ -42,12 +43,13 @@ export function SiteFooter() {
             <p className="small" style={{ lineHeight: 2 }}>
               <Link href="/demo">Request-routing demo</Link><br />
               <Link href="/request">Guest request form (sample hotel)</Link><br />
-              <Link href="/dashboard">Sample dashboard</Link>
+              <Link href="/dashboard">Sample dashboard</Link><br />
+              <a href="https://www.linkedin.com/company/staymosaic/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
             </p>
           </div>
         </div>
         <p className="small" style={{ marginTop: "2rem", borderTop: "1px solid #444", paddingTop: "1rem" }}>
-          Prototype build. All hotels, guests, staff and reviews shown are fictional sample data. Integrations marked “not connected” or “planned” are not live. See the in-app Integrations page for the exact status.
+          © StayMosaic · staymosaic.site<br />Prototype build. All hotels, guests, staff and reviews shown are fictional sample data. Integrations marked “not connected” or “planned” are not live. See the in-app Integrations page for the exact status.
         </p>
       </div>
     </footer>

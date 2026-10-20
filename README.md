@@ -1,6 +1,6 @@
 # StayMosaic
 
-AI-native operations platform for hotels and serviced apartments. Guest requests become organised, trackable tasks; the AI **recommends** within hotel-configured rules and **staff decide**.
+AI-native operations platform for hotels and serviced apartments. Website: https://staymosaic.site Guest requests become organised, trackable tasks; the AI **recommends** within hotel-configured rules and **staff decide**.
 
 > **Prototype.** Everything shown uses fictional sample data. See [Honest status](#honest-status).
 
