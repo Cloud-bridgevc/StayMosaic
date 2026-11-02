@@ -1,7 +1,10 @@
+import Script from "next/script";
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import "./glow.css";
 
 export const metadata: Metadata = {
+  manifest: "/manifest.webmanifest",
   metadataBase: new URL("https://staymosaic.site"),
   openGraph: { siteName: "StayMosaic", url: "https://staymosaic.site", type: "website" },
   title: { default: "StayMosaic: AI-native operations for hotels and serviced apartments", template: "%s · StayMosaic" },
@@ -13,7 +16,9 @@ export const viewport: Viewport = { width: "device-width", initialScale: 1, them
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <Script src="/glow.js" strategy="afterInteractive" />
+        <script type="application/ld+json" id="founders-ld" dangerouslySetInnerHTML={{ __html: "{\"@context\": \"https://schema.org\", \"@type\": \"Organization\", \"name\": \"StayMosaic\", \"url\": \"https://staymosaic.site\", \"email\": \"hello@staymosaic.site\", \"logo\": \"https://staymosaic.site/icon-512.png\", \"founder\": [{\"@type\": \"Person\", \"name\": \"Harris Morrison\", \"jobTitle\": \"Founder/CEO\"}, {\"@type\": \"Person\", \"name\": \"Majekodunmi Fasheke\", \"jobTitle\": \"Co-founder/CTO\"}]}" }} />{children}</body>
     </html>
   );
 }

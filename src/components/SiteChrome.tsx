@@ -7,6 +7,7 @@ export function SiteHeader() {
       <div className="inner">
         <Brand />
         <nav className="nav" aria-label="Main">
+          <Link className="hide-sm" href="/#problem">Problem</Link>
           <Link className="hide-sm" href="/features">Features</Link>
           <Link className="hide-sm" href="/use-cases">Use cases</Link>
           <Link className="hide-sm" href="/pricing">Pricing</Link>
@@ -49,7 +50,7 @@ export function SiteFooter() {
           </div>
         </div>
         <p className="small" style={{ marginTop: "2rem", borderTop: "1px solid #444", paddingTop: "1rem" }}>
-          © StayMosaic · staymosaic.site<br />Prototype build. All hotels, guests, staff and reviews shown are fictional sample data. Integrations marked “not connected” or “planned” are not live. See the in-app Integrations page for the exact status.
+          © StayMosaic · staymosaic.site · Founded by Harris Morrison (Founder/CEO) &amp; Majekodunmi Fasheke (Co-founder/CTO) · <Link href="/privacy">Privacy</Link> · <Link href="/terms">Terms</Link><br />Prototype build. All hotels, guests, staff and reviews shown are fictional sample data. Integrations marked “not connected” or “planned” are not live. See the in-app Integrations page for the exact status.
         </p>
       </div>
     </footer>

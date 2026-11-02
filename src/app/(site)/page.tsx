@@ -1,9 +1,6 @@
 import Link from "next/link";
 
-const TEAM = [
-  { name: "Harris Morrison", role: "Founder and CEO" },
-  { name: "Majekodunmi Fasheke", role: "Co-Founder and CTO" },
-];
+import { GlowPill, GlowTop, GlowMid, GlowTeam } from "@/components/Glow";
 
 const STEPS = [
   { n: "1", t: "A request arrives", d: "From your guest form or the front desk. Photos and PDFs attach securely once storage is connected." },
@@ -26,6 +23,7 @@ export default function Home() {
       <section className="hero">
         <div className="wrap hero-grid">
           <div>
+            <GlowPill />
             <div className="eyebrow">Hospitality operations, organised</div>
             <h1>Every guest request, routed with care.</h1>
             <div className="gold-rule" />
@@ -54,6 +52,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <GlowTop />
 
       <section className="section alt">
         <div className="wrap">
@@ -88,6 +88,8 @@ export default function Home() {
         </div>
       </section>
 
+      <GlowMid />
+
       <section className="section dark">
         <div className="wrap grid g2" style={{ alignItems: "center", gap: "3rem" }}>
           <div>
@@ -105,20 +107,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="section alt" id="team">
-        <div className="wrap">
-          <div className="eyebrow">Team</div>
-          <h2>The people behind StayMosaic</h2>
-          <div className="grid g2" style={{ marginTop: "1.5rem", maxWidth: 760 }}>
-            {TEAM.map((m) => (
-              <div className="card" key={m.name}>
-                <h3 style={{ marginBottom: "0.2rem" }}>{m.name}</h3>
-                <div className="small muted">{m.role}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <GlowTeam />
 
       <section className="section">
         <div className="wrap" style={{ textAlign: "center", maxWidth: 720 }}>

@@ -47,3 +47,16 @@ db/schema.sql  PostgreSQL target schema
 infra/         SAM template + Lambda scaffolds
 docs/          architecture and HubSpot plan
 ```
+
+## Launch readiness (glow-up)
+
+- Home page: problem section with three sourced statistics, what-we-solve, comparison table, AI section, founder cards and roadmap, with scroll-reveal motion that respects reduced motion. Sections live in `src/components/Glow.tsx` (generated markup), styles in `src/app/glow.css`, motion in `public/glow.js`.
+- New routes: `/privacy`, `/terms` (review drafts). Footer credits the founders.
+- Ship assets: `opengraph-image.png`, `twitter-image.png`, `apple-icon.png`, `icon.svg`, `public/manifest.webmanifest`, icons, founders JSON-LD; sitemap includes the new routes.
+- Fixed small horizontal overflows on phones (long badges, dashboard role picker).
+
+### Content to confirm before launch
+- Contact email `hello@staymosaic.site` is a placeholder (used for early-access requests) — create the forward or replace it.
+- Statistics (AHLA staffing surveys via Hospitality Net) — re-check figures and links.
+- Founder bios describe roles only; replace with confirmed biographies.
+- Privacy notice and terms need operator details and governing law.
